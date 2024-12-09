@@ -21,7 +21,6 @@ iris5 <- iris %>%
   group_by(Species) %>%
   summarise(moyenne = mean(Petal.Width))
 
-
 iris6 <- iris %>%
   mutate(Sum.Width = sum(Petal.Width, Sepal.Width)) 
 
@@ -121,4 +120,37 @@ resume2_1 <- hflights
   
   
   oa <- read_csv("C:/Users/cepe-s4-09/Desktop/ravary_20112024/openaustralie2013.csv")
+  
+  tennis <- bind_rows(RG=rg, OA=oa, .id = "id")
+
+  tennis2 <- tennis %>%
+    group_by(id) %>%
+    summarise(nb_matchs = n())
+  
+  nb_aces <- tennis %>%
+    group_by(id, Round) %>%
+    summarise(moy_aces = mean(ACE.1 + ACE.2))
+
+  nb_aces2 <- nb_aces %>%
+    pivot_wider(names_from = "Round", values_from = "moy_aces")
+
+  
+  n_victoires <- function(tbl, names){
+    return(
+      nrow(filter(table, (Player1 == names & Result == 1) | (Player2 == names & Result == 0)))
+    )
+  }  
+
+  
+  n_victoires(nb_aces2, "")  
+  
+  oa_joueurs <- bind_rows(oa %>% select(Joueur=Player1), 
+                          oa %>% select(Joueur=Player2)) %>% 
+    distinct() %>% 
+    rowwise() %>% 
+    mutate(Victoires=n_victoires(oa, Joueur)) 
+  oa_joueurs
+  
+  
+  
   
