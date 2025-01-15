@@ -229,5 +229,53 @@
                  verbose = TRUE,
                  grid = 20,
                  fn = "tune_grid")
+
+  # Visualiser et analser les résultats
+  
+  wf_set_fitted %>% rank_results(rank_metric = "roc_auc")
+  
+  autoplot(
+    wf_set_fitted,
+    metric= "roc_auc",
+    select_best = TRUE
+  )
+
+  # Extraire et finaliser le meilleur workflow
+  
+  res <- wf_set_fitted %>%
+    rank_results(rank_metric = "roc_auc") %>%
+    filter(.metric == "roc_auc") %>%
+    arrange(desc(mean))
+
+  res  
+
+  best_wf_id <- res$wflow_id[1]
+  
+  best_wf <- extract_workflow_set_result(wf_set_fitted, id = best_wf_id)
+  
+  best_params <- select_best(best_wf, metric = "roc_auc")
+  
+  final_wf <- finalize_workflow(
+    extract_workflow(wf_set_fitted, "basic_gb"),
+    best_params
+  )
+  
+  last_fit <- final_wf %>% last_fit(split = dataset_split) 
+  
+  last_fit %>% collect_metrics()
+  
+  last_fit %>% collect_predictions()
+  
+  #results %>% wf_set_fitted %>%
+  #  extract_workflow_set_result()
+  
+  # on peut sauver last_fit avec saveRDS
+  # et après faire un readRDS
+  
+  saveRDS(last_fit, "path/to/final_workflow.rds")
+  final_workflow <- readRDS("path/to/final_workflow.rds")
+  
+  predictions <- predict(final_workflow, new_data)
+  
   
   
