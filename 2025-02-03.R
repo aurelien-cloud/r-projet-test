@@ -48,5 +48,5 @@
 
 # la sigmoïde est une sorte de généralisation de l'indicatrice
 
-# ReLU : fonction partie positive
+# ReLU : fonction partie positive max(0,x). C'est la plus utilisée.
 
