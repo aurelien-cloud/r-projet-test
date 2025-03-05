@@ -28,5 +28,6 @@
 
 # le problème des réseaux de neurones, c'est que la structure de calibration est compliquée
 # autre souci, c'est vraiment une boîte noire
-
+# Contrairement aux forêts aléatoires, on ne peut pas déterminer la contribution
+# des variables avec les réseaux de neurones
 
