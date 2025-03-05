@@ -26,4 +26,7 @@
 # normaliser ne change pas les  résultats en termes de prévision ! le seul point,
 # c'est que l'interprétation n'est plus la même.
 
+# le problème des réseaux de neurones, c'est que la structure de calibration est compliquée
+# autre souci, c'est vraiment une boîte noire
+
 
