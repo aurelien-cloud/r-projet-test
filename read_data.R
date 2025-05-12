@@ -153,6 +153,9 @@ for(ii in 2018:2022){
   tmpaic <- step(tmp,trace=0)
   RES[blocs==ii,"aic"] <- predict(tmpaic,donTEST)
   ####
+  tmpbic <- step(tmp,trace=0,k=log(nrow(donAPP)))
+  RES[blocs==ii,"bic"] <- predict(tmpbic,donTEST)
+  ####
   foret <- randomForest(Y~.-date,donAPP)
   RES[blocs==ii,"foret"] <- predict(foret,donTEST)
 
@@ -163,6 +166,44 @@ for(ii in 2018:2022){
   dontestxgb <- donTEST
   donAPP <- rbind(donAPP,donTEST)
 }
-RES <- RES[don$date>2017,]
+
 erreur <- function(X,Y){mean((X-Y)^2)}
-apply(RES,2,erreur,Y=RES$Y)
+
+for(ii in 2018:2022){
+  res <- RES[don$date==ii,]
+  print(apply(res,2,erreur,Y=res$Y))
+}
+
+
+RESf <- RES[don$date>2017,]
+apply(RESf,2,erreur,Y=RESf$Y)
+
+
+modbic <-  lm(Y~.-date,don)
+modbicfin <- step(modbic,trace=0,k=log(nrow(don)))
+####### soit on fait la matrice et on prévoit tout d'un coup
+tstout <- ts(diff(donfr$FR),start=c(1996,02),frequency=12)
+#####################################################################
+Y <- as.vector(tstout)
+donf <- data.frame(Y=Y)
+for(ii in 1:12){
+  donf[,ii+1] <- lag(Y,n=ii)
+}
+dim(donf)
+names(donf) <- c("Y",paste("Xd",1:12,sep=""))
+donf <- donf[-(1:13),]
+dim(donf)
+dim(don)
+don[nrow(don),]
+donf[nrow(don),]
+###### PREVISION
+prev <- predict(modbicfin,donf[-(1:nrow(don)),])
+tsprev <- ts(prev,start=c(2023,01),frequency=12)
+lines(tsprev,col=2,lwd=2)
+###############################################
+
+################################################
+##########
+################################################
+bank <- read.table("bank.csv",header=T,sep=";",stringsAsFactors = T)
+summary(bank)
